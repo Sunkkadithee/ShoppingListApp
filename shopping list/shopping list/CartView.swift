@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CartView: View {
-    var items: [ShoppingItem]
+    @State var items: [ShoppingItem]  // Make items mutable with @State
     
     // Get unpurchased items
     var unpurchasedItems: [ShoppingItem] {
@@ -40,23 +40,45 @@ struct CartView: View {
                 .padding(.vertical)
 
             // List of unpurchased items with their quantity and price
-            List(unpurchasedItems) { item in
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(item.name)
-                            .font(.headline)
-                            .foregroundColor(.black)
-                        
-                        Text("Qty: \(item.name.split(separator: "(").last?.split(separator: ")").first ?? "")")
+            List {
+                ForEach(unpurchasedItems) { item in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(item.name)
+                                .font(.headline)
+                                .foregroundColor(.black)
+                            
+                            Text("Qty: \(item.name.split(separator: "(").last?.split(separator: ")").first ?? "")")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+                        Spacer()
+                        Text(item.price)
                             .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.green)
                     }
-                    Spacer()
-                    Text(item.price)
-                        .font(.subheadline)
-                        .foregroundColor(.green)
+                    .padding(.vertical, 5)
+                    .swipeActions {
+                        // Swipe Action for Deleting
+                        Button {
+                            deleteItem(item)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                                .foregroundColor(.red)
+                        }
+                        .tint(.red)
+                        
+                        // Swipe Action for Editing
+                        Button {
+                            editItem(item)
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                                .foregroundColor(.blue)
+                        }
+                        .tint(.blue)
+                    }
                 }
-                .padding(.vertical, 5)
+                .onDelete(perform: deleteItems)  // Enable swipe to delete in case swipeActions is not used
             }
             .listStyle(PlainListStyle())
             
@@ -96,22 +118,46 @@ struct CartView: View {
             }
             .padding(.horizontal)
             .padding(.bottom)
+            
+            // Remove Cart Button
+            Button(action: {
+                // Action to remove all items from the cart
+                items.removeAll()  // This will delete all items in the cart
+            }) {
+                Text("Remove Cart")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.red)
+                    .cornerRadius(10)
+                    .shadow(radius: 5)
+            }
+            .padding(.top)
 
             Spacer()
         }
         .padding()
-        .navigationBarTitle("Cart", displayMode: .inline)
         .navigationBarBackButtonHidden(true) // Hide the default back button
     }
-}
-
-struct CartView_Previews: PreviewProvider {
-    static var previews: some View {
-        CartView(items: [
-            ShoppingItem(name: "Pork (2)", price: "$76.00 (2 x $38.00)", category: "Meats", purchased: false),
-            ShoppingItem(name: "Cucumbers", price: "$5.00", category: "Vegetable", purchased: false),
-            ShoppingItem(name: "Rice", price: "$10.00", category: "Pasta, Rice & Cereals", purchased: false)
-        ])
+    
+    // Function to delete selected items
+    func deleteItems(at offsets: IndexSet) {
+        items.remove(atOffsets: offsets)  // Remove the item at the specified index
+    }
+    
+    // Function to delete a specific item
+    func deleteItem(_ item: ShoppingItem) {
+        if let index = items.firstIndex(where: { $0.id == item.id }) {
+            items.remove(at: index)
+        }
+    }
+    
+    // Function to edit a specific item
+    func editItem(_ item: ShoppingItem) {
+        // For example, show an alert or navigate to an edit screen
+        // In a real app, you can present a modal or a new view for editing
+        print("Editing \(item.name)")
     }
 }
 

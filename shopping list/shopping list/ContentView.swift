@@ -1,10 +1,3 @@
-
-//
-//  ContentView.swift
-//  shopping list
-//
-//  Created by Pang Sunkkadithee on 2025-02-24.
-//
 import SwiftUI
 
 // Data model for a shopping list
@@ -150,6 +143,7 @@ struct ContentView: View {
                     }
                 )
             }
+            .navigationBarBackButtonHidden(true) // Hides the back button
         }
     }
     
