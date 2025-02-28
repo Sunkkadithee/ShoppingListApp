@@ -1,10 +1,3 @@
-
-//
-//  ContentView.swift
-//  shopping list
-//
-//  Created by Pang Sunkkadithee on 2025-02-24.
-//
 import SwiftUI
 
 // Data model for a shopping list
@@ -50,28 +43,6 @@ struct ContentView: View {
                             .foregroundColor(.white)
                     }
                     
-                    Button(action: {
-                        // Cart action
-                        print("Cart button tapped")
-                    }) {
-                        ZStack {
-                            Image(systemName: "cart.fill")
-                                .font(.title)
-                                .foregroundColor(.white)
-                            
-                            // Badge for count
-                            if lists.count > 0 {
-                                Text("\(lists.count)")
-                                    .font(.caption)
-                                    .bold()
-                                    .foregroundColor(.white)
-                                    .frame(width: 20, height: 20)
-                                    .background(Color.red)
-                                    .clipShape(Circle())
-                                    .offset(x: 10, y: -10) // Adjust position of the badge
-                            }
-                        }
-                    }
                 }
                 .padding()
                 .background(Color(red: 11/255, green: 61/255, blue: 145/255))
@@ -172,6 +143,7 @@ struct ContentView: View {
                     }
                 )
             }
+            .navigationBarBackButtonHidden(true) // Hides the back button
         }
     }
     
@@ -187,4 +159,3 @@ struct ContentView: View {
         }
     }
 }
-
