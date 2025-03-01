@@ -1,13 +1,12 @@
 import SwiftUI
 
-// Data model for an item in the shopping list
 struct ShoppingItem: Identifiable {
     let id = UUID()
     var name: String
     var price: String
     var category: String
-    var quantity: String  // Added quantity
-    var description: String  // Added description
+    var quantity: String
+    var description: String
     var purchased: Bool
 }
 
@@ -17,12 +16,11 @@ struct ShoppingListDetailView: View {
     @State private var items: [ShoppingItem] = [
         ShoppingItem(name: "Pork (2)", price: "$76.00 (2 x $38.00)", category: "Meats", quantity: "2", description: "Fresh pork meat", purchased: false),
         ShoppingItem(name: "Cucumbers", price: "$5.00", category: "Vegetable", quantity: "1", description: "Fresh cucumbers", purchased: false),
-        ShoppingItem(name: "Rice", price: "$10", category: "Pasta, Rice & Cereals", quantity: "1", description: "White rice", purchased: false),
-        ShoppingItem(name: "Tooth brush", price: "$15", category: "Personal care", quantity: "1", description: "Tooth brush for adults", purchased: false),
         ShoppingItem(name: "Butter", price: "$10", category: "Dairy", quantity: "1", description: "Salted butter", purchased: true),
         ShoppingItem(name: "Eggs", price: "$10", category: "Dairy", quantity: "12", description: "A dozen eggs", purchased: true)
     ]
     
+    @State private var showAddItemView = false
     @State private var selectedItem: ShoppingItem? = nil
     @State private var showActionSheet = false
     @State private var actionSheetItem: ShoppingItem? = nil
@@ -35,7 +33,9 @@ struct ShoppingListDetailView: View {
                 
                 // Header Section (Add Item Button)
                 VStack {
-                    NavigationLink(destination: AddItemView()) {
+                    NavigationLink(destination: AddItemView { newItem in
+                        items.append(newItem)  // Agregar el ítem seleccionado
+                    }) {
                         HStack {
                             Image(systemName: "plus.circle.fill")
                             Text("ADD ITEM")
@@ -49,10 +49,10 @@ struct ShoppingListDetailView: View {
                     }
                     .padding()
                 }
-                .background(Color(red: 11/255, green: 61/255, blue: 145/255)) // Background color for the header
-                .zIndex(1) // Ensure this stays on top of the scrollable content
+                .background(Color(red: 11/255, green: 61/255, blue: 145/255)) // Fondo de la cabecera
+                .zIndex(1) // Aseguramos que este botón esté encima del contenido deslizante
                 
-                // Scrollable content section
+                // Contenido deslizante (ScrollView)
                 ScrollView {
                     VStack(spacing: 15) {
                         ForEach(groupedItems.keys.sorted(), id: \.self) { category in
@@ -82,7 +82,7 @@ struct ShoppingListDetailView: View {
                                         
                                         Button(action: {
                                             actionSheetItem = item
-                                            showActionSheet.toggle() // Show the action sheet
+                                            showActionSheet.toggle() // Mostrar hoja de acciones
                                         }) {
                                             Image(systemName: "ellipsis")
                                                 .font(.title2)
@@ -100,7 +100,7 @@ struct ShoppingListDetailView: View {
                     }
                     .padding(.vertical)
                 }
-                .padding(.top, 20) // Add some top padding to ensure content doesn't overlap with the header
+                .padding(.top, 20) // Aseguramos que el contenido no se superponga con el encabezado
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
@@ -110,7 +110,7 @@ struct ShoppingListDetailView: View {
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
-                        .padding(.top, 10) // Add padding to move it lower
+                        .padding(.top, 10) // Ajustamos la posición
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -119,7 +119,7 @@ struct ShoppingListDetailView: View {
                             Image(systemName: "cart.fill")
                                 .font(.title)
                                 .foregroundColor(.white)
-                                .padding(.top, 10) // Add padding to move it lower
+                                .padding(.top, 10) // Ajustamos la posición
                             
                             if items.filter({ $0.purchased }).count > 0 {
                                 Text("\(items.filter { $0.purchased }.count)")
@@ -178,3 +178,4 @@ struct ShoppingListDetailView: View {
         }
     }
 }
+

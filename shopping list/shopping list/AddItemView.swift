@@ -1,127 +1,49 @@
 import SwiftUI
 
 struct AddItemView: View {
+    let availableItems = [
+        ShoppingItem(name: "Apple", price: "$1.00", category: "Fruits", quantity: "1", description: "Red apple", purchased: false),
+        ShoppingItem(name: "Banana", price: "$0.50", category: "Fruits", quantity: "1", description: "Yellow banana", purchased: false),
+        ShoppingItem(name: "Carrot", price: "$0.75", category: "Vegetables", quantity: "1", description: "Fresh carrots", purchased: false),
+        ShoppingItem(name: "Milk", price: "$2.00", category: "Dairy", quantity: "1", description: "Whole milk", purchased: false),
+        ShoppingItem(name: "Bread", price: "$1.50", category: "Bakery", quantity: "1", description: "Fresh bread", purchased: false)
+    ]
+    
+    @State private var selectedItems: [ShoppingItem] = []
     @Environment(\.presentationMode) var presentationMode
-    @State private var searchQuery: String = ""
-    @State private var items: [String] = ["Apple", "Banana", "Carrot", "Milk", "Eggs", "Bread"]
-    @State private var addedItems: [String] = []
-    @State private var selectedItems: Set<String> = []
-
+    var onAdd: (ShoppingItem) -> Void
+    
     var body: some View {
-        VStack(spacing: 0) { // No extra spacing issues
-            // **Header Section with Background**
-            VStack(spacing: 15) {
-                // **Title**
-                Text("Grocery List")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-            
-
-                // **Search Bar**
-                HStack {
-                    TextField("Search or Add Item", text: $searchQuery)
-                        .padding(12)
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .shadow(radius: 3)
-                        .overlay(
-                            HStack {
-                                Spacer()
-                                if !searchQuery.isEmpty {
-                                    Button(action: { searchQuery = "" }) {
-                                        Image(systemName: "x.circle.fill")
-                                            .foregroundColor(.gray)
-                                            .padding(.trailing, 10)
-                                    }
-                                }
-                            }
-                        )
-                        .padding(.horizontal, 15)
-                }
-            }
-            .padding(.bottom, 15)
-            .frame(maxWidth: .infinity) // Fill width
-            .background(Color(red: 11/255, green: 61/255, blue: 145/255)) // Full background
-           
-           
-            // **Divider**
-            Divider()
-
-            // **List of Items**
-            List {
-                ForEach(items.filter { searchQuery.isEmpty || $0.lowercased().contains(searchQuery.lowercased()) }, id: \.self) { item in
+        NavigationView {
+            VStack {
+                List(availableItems) { item in
                     HStack {
-                        Text(item)
-                            .font(.body)
-                            .foregroundColor(selectedItems.contains(item) ? .white : .primary)
-                            .padding(10)
-                            .background(selectedItems.contains(item) ? Color.orange : Color.clear)
-                            .cornerRadius(10)
-                            .animation(.easeInOut(duration: 0.2), value: selectedItems.contains(item))
-                        
+                        Text(item.name)
                         Spacer()
-                        
                         Button(action: {
-                            if selectedItems.contains(item) {
-                                selectedItems.remove(item)
-                            } else {
-                                selectedItems.insert(item)
+                            if !selectedItems.contains(where: { $0.id == item.id }) {
+                                selectedItems.append(item)
                             }
                         }) {
-                            Image(systemName: selectedItems.contains(item) ? "checkmark.circle.fill" : "plus.circle.fill")
-                                .foregroundColor(selectedItems.contains(item) ? .orange : .blue)
-                                .font(.title)
+                            Image(systemName: "plus.circle")
                         }
                     }
-                    .padding(.vertical, 10)
                 }
                 
-                // **Custom Item Input**
-                if !items.contains(searchQuery) && !searchQuery.isEmpty {
-                    HStack {
-                        Text("Add '\(searchQuery)'")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                        Spacer()
-                        Button(action: {
-                            items.append(searchQuery)
-                            addedItems.append(searchQuery)
-                            selectedItems.insert(searchQuery)
-                            searchQuery = ""
-                        }) {
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundColor(.blue)
-                        }
+                Button("Done") {
+                    for item in selectedItems {
+                        onAdd(item)
                     }
-                    .padding(.vertical, 10)
+                    presentationMode.wrappedValue.dismiss()
                 }
+                .padding()
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(10)
             }
-            .listStyle(PlainListStyle())
-
-            Spacer()
-
-            // **Done Button**
-            Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                Text("DONE")
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .cornerRadius(10)
-                    .shadow(radius: 3)
-            }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 15)
+            .navigationTitle("Add Items")
         }
-        .navigationBarHidden(true)
-        .background(Color(UIColor.systemGroupedBackground))
     }
 }
 
-struct AddItemView_Previews: PreviewProvider {
-    static var previews: some View {
-        AddItemView()
-    }
-}
+
